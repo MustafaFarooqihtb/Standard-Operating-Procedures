@@ -1,0 +1,222 @@
+ 
+REVISION HISTORY
+AUTHORREVISED SECTION/PARAGRAPHREVRELEASEDNaomi HopeFirst draft1.0August 2021
+Nita JhummuSecond Draft2.0October 2021Tabitha LovellMinor edits following SOP testing2.1Tabitha LovellNew SOP for improved G drive process3.0June 2022Joseph BryantNew SOP to accommodate new SAS code4.0 October 2022Joseph BryantNew SOP with updated SAS code5.0June 2023Arjun NiranjanInclude WBL Arrears (Manual)6.0July 2023Luke LobatoCleaned up Process6.1August 2023Ben ConwayClarifications and Amendments6.2July 2024Brendan TamTake out 2 incorrect WBL Defaults6.3September 2024Ben ConwayNew location for DF Information6.4April 2025
+
+
+
+
+		
+
+CONTENTS
+
+1.	PURPOSE	3
+2.	SCOPE	3
+3.	RESPONSIBILITIES	3
+4.	RESOURCES	3
+5.	PROCEDURE	4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. PURPOSE
+The purpose of this Standard Operating Procedure (SOP) is to outline the process used to create four arrears files: for AF, DF, SM and WBL. These files contain a summary of all accounts in arrears at the end of each reporting month. We save these in the in the G:\SHARED folder, so that all employees have access to them.
+SCOPE2. 
+3. RESPONSIBILITIES
+4. RESOURCES
+* Month Arrears Summary – Risk Reporting, WD5
+* SM MI – Risk Reporting, WD3
+* AF MI – Risk Reporting, WD3
+* DF Core – BI, WD3
+* WBL IFRS9 Extract – WBL, WD3
+5. PROCEDURE
+The code used for creation of each of the files (SM/AF/DF only; WBL is manual) is located here:
+\\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\Credit Risk Analytics\Month end arrears and past due\Shared Arrears Reporting\Code
+5.1 Preparing the files
+Several files are used to get the data for the arrears files. Ensure each one is ready before continuing with the code. 
+1. First navigate to:
+\\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\Credit Risk Analytics\Month end arrears and past due\ and go to the most recent month, which should be the reporting month.
+
+2. For SM and DF, the Arrears summary file is used. It is located here: 
+\\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\Credit Risk Analytics\Month end arrears and past due\NN. Month YYYY\Month yyyy summary.xlsx
+   Check with the owner that the file is ready then follow the below steps to create the required files
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+File NameHow to create itArrears_DF_yyyymm.csvGo to the mm yyyy summary in \\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\Credit Risk Analytics\Month end arrears and past due\ in the current month, in the Month-end Arrears and Past Dues tab, and look down Column A until you get to DF Arrears. Then copy the DF arrears data in Columns H, I, J, K (Account Number, Balance, Bucket, Arrears) to a new excel file but make sure that the columns are in the following order: Balance, Arrears, Bucket, Account number. Also include the headers of the columns, but use ALT + H + V + V to just paste values and not the format. Rename the account number column to Account_Number. Save this as a csv file in the G Drive folder using the name on the left where mm is the current reporting month. Ensure you only copy the arrears data and not the past dues data.Arrears_SM_yyyymm.csvSame as above but copying SM Arrears data instead. We have now split the STLs from the Term Loans in SM, so make sure to copy the SM arrears data into the new csv file and then the STL arrears data into the same file, simply appending it onto the last row.DF_Accounts.csvOpen the DF_MI_YYYYMM file in the below folder for this reporting cycle
+
+ \\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\New Risk Appetite Templates\Credit Risk\nn. Month’yy CC\Input\DF 
+
+and copy the columns B, C and D (Account number, Exposure Group, Customer) into a new csv file. Then copy date loan drawn  (column CC). Make sure that the column headers (account number, Exposure Group etc.) are in the top row (so delete any rows above them in your file you’ve copied over to). Rename the column Date Loan Drawn to inception_date. Delete any rows that have dates that are tbc or blank, these are undrawn accounts that could not have gone into arrears yet. Also make sure the inception dates are in the date format. Save the file as a csv  and call it DF_accounts, save this in the G Drive folder
+There should now be 3 files in the G Drive folder for this month, 2 arrears files and one df_accounts. Ensure these are all CSVs.
+3. For information on Watch, navigate to:
+\\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\Credit Risk Analytics\Data\SAS Datasets\Watch & Recoveries
+And look at the date modified on the watch_recovery SAS dataset. If this has been updated this month then it is ready to be used, if not check with the watchlist process owner to see if the SAS dataset has been updated.
+
+4. For defaults navigate to:
+\\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\New Risk Appetite Templates\Credit Risk\NN. Month’YYYY CC\Input\Defaults and ensure the default List – Month YY is there. Check with the default list process owner that this file is ready.
+
+5. For AF arrears, the AF_arrears_list SAS dataset is required. It is located here: \\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\Credit Risk Analytics\2 - Asset Finance\AF MI Data\Outputs\AF_Arrears\SAS Dataset
+Check with the AF_MI owner that this file is ready
+
+Finally, for EML we use the EML data in the Central Data Repository6. . Check with the EML process owner to see if this file is ready.
+
+Once all the files are ready, the code is ready to be run7. 
+5.2 Running the code
+When running the code, ensure you run one program at a time as there are several checks that need to be done before the exports. The code is called Arrears_data and is located here: 
+
+\\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\Credit Risk Analytics\Month end arrears and past due\Shared Arrears Reporting\Code
+
+Program – Macro
+The macro program contains the libraries and macros that will be used throughout the code
+
+The Watch Library contains the dataset where the watch and recoveries information will be kept
+The AF_arrs library contains the af_arrears_list which is the main import for the AF arrears file
+The SM_MI library contains the sm_mi dataset which will be used to get the exposure group names for SM.
+
+Ensure you update the macro variables to the most recent information.
+* Date_input is the last day of the report month (the month before the month you are in)
+* Arrears_folder is the folder that contains the G Drive folder with the inputs you prepared early. It should also be the report month in the format NN. Month YYYY
+* def_list_data is the name of the default list excel file in the below folder where NN. MONTH'YY CC refers to this month
+
+\\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\New Risk Appetite Templates\Credit Risk\NN. MONTH'YY CC\Input\Defaults
+
+
+
+Ensure all these are up to date, then run this section.
+
+Program – Import
+This program imports all of the required datasets and files.
+1. The AF arrears list is imported first. Check that the report_date matches the current reporting month
+
+2. For SM, 2 files are imported, the arrears_SM csv created previously, and the SM_MI to get the exposure names.
+
+3. For DF, we just import the two files created previously.
+
+4. Ensure the above files are imported correctly
+
+5. The watchlist is then imported. The watchlist file uses the start of the month as its report date, as the end of the month is used elsewhere, the code updates this to the end of the month
+a. Ensure the most recent report date is there, if it isn’t, ask the watchlist process owner.
+
+6. The EML list is then imported. The balances file that is imported contains all the accounts which have left EML this month is well. In the file, the ones which left EML have a 0 group exposure, these are excluded in the code
+a. As a side note, new to EML cases have a 0 exposure for last month, and a positive one for this month
+
+7. Finally the default list is imported. This file has different tabs for each portfolio, as a result, each portfolio is imported separately. Check these are imported correctly
+a. The code adds a default flag (=1) this will be joined onto the arrears files later.
+
+
+Program – AF
+
+This program produces the AF arrears list that will be exported.
+
+1. The code starts by keeping and renaming the relevant variables from the AF_arrears_list. It also contains a manual adjustment for the 1-30 days bucket to ensure that it is the same format, add any other manual adjustments here if necessary.
+
+2. The columns are then put in the correct order.
+
+3. Watch and recoveries data is joined on, followed by EML and then defaults. This is done on both accounts numbers to ensure to capture all observations.
+
+
+Program – SM & DF
+This is a very similar process to AF, the main difference is both of these programs have to join the exposure group name separately (done with DF_accounts for DF and SM MI for SM).
+One final difference is that the join is done with just one account number, compared to 2 for AF.
+
+Program – Export
+Before the datasets are exported, they undergo several checks. 
+
+First the column order is checked. This is important as the files are often imported into code, where the columns must be the same. Check the 3 datasets af, df and sm col_check to ensure the columns are in the same order.
+
+The next check completed is that there is only one format for each arrears bucket. For example, sometimes 1-30 days (lowercase d) may be formatted as 1-30 Days (capital D), ensure that these are manually adjusted in the code.
+
+Next, ensure the volumes are as expected, check that the number of rows match the volume of arrears cases for each portfolio.
+
+The files are then exported to here:
+
+\\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\Credit Risk Analytics\Month end arrears and past due\Shared Arrears Reporting
+
+Open each of them and check for obvious errors, such as empty columns.
+
+Send to a member of the teams for a 4-eye check
+
+5.3 WBL Arrears
+1. Find this reporting month’s WBL IFRS9 extract here: \\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\New Risk Appetite Templates\WBL Credit Pack\Core_Excel
+
+2. Filter ‘Days in Arrears’ (col W) and ‘Arrears Amount’ (col Q) for anything APART from negatives, zeroes, or blanks.
+
+3. In a new Excel file (called WBL_Arrears_YYYYMM.csv) copy in the agreement number (col A), the Exposure (col E) and the Days in Arrears (col W).
+
+4. Multiply the Exposure by -1 to align with HTB reporting (WBL reports exposures as negative where HTB reports them as positive).
+
+5. Save this WBL Arrears file in the below folder path:
+
+\\htbplc.net\users\Groups\DEPARTMENTS\RISK and COMPLIANCE\Credit Risk Analytics\Month end arrears and past due\Shared Arrears Reporting
+
+
+Save the files in the SHARED folder
+
+Once the DF/SM/AF/WBL_Arrears_YYYYMM.csv files are sent to a member of the Risk Reporting team for a 4-eye check.1. 
+Once the check is complete, copy the files into G:\SHARED\Risk Arrears Reporting.
+
+ 
+* 
+* 
+* 
+* 
+* 
+* 
+* 
+* 
+* 
+* 
+* 
+* 
+* 
+
+[TL1]Date Loan Drawn column?
+
+
+Credit Risk ReportingPg.  6 of 6OWNER: Director of Credit Analytics & Model GovernanceCredit RiskRev: 5.0
+
+
+
+
+
+
+
+
+
